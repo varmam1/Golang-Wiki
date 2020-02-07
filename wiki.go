@@ -15,7 +15,7 @@ type Page struct {
 	Body  []byte
 }
 
-var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
+var templates = template.Must(template.ParseFiles("edit.html", "view.html", "choice.html"))
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 
 func (p *Page) save() error {
@@ -78,7 +78,10 @@ func getTitle(w http.ResponseWriter, r *http.Request) (string, error){
 
 
 func rootHandler(w http.ResponseWriter, r *http.Request){
-	http.Redirect(w, r, "/view/FrontPage", http.StatusFound)
+	err := templates.ExecuteTemplate(w, "choice.html", r)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
 }
 
 func makeHandler(fn func (http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
